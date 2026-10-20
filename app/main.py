@@ -12,7 +12,7 @@ from .schemas import VisitIn, PropertyOut
 from .services import require_lead, create_visit, normalize_property
 
 ROOT = Path(__file__).resolve().parent.parent
-app = FastAPI(title="Raíz Urbana", docs_url=None, redoc_url=None, openapi_url=None)
+app = FastAPI(title="Raíz Urbana")
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 def read_token(value: Annotated[str, Header(alias="X-Lead-Token")]):
     try:
