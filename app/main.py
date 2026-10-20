@@ -10,9 +10,12 @@ from .db import get_db
 from .config import get_settings
 from .schemas import VisitIn, PropertyOut
 from .services import require_lead, create_visit, normalize_property
+from .docs import install_documentation
 
 ROOT = Path(__file__).resolve().parent.parent
-app = FastAPI(title="Raíz Urbana")
+# Custom documentation routes allow their CDN assets without relaxing the site CSP.
+app = FastAPI(title="Raíz Urbana", docs_url=None, redoc_url=None, openapi_url="/openapi.json")
+install_documentation(app)
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 def read_token(value: Annotated[str, Header(alias="X-Lead-Token")]):
     try:
@@ -32,8 +35,8 @@ async def security_headers(request: Request, call_next):
         "Cache-Control": "no-store", "Referrer-Policy": "no-referrer",
         "X-Content-Type-Options": "nosniff", "X-Frame-Options": "DENY",
         "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
-        "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
     })
+    response.headers.setdefault("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'")
     return response
 
 
@@ -118,32 +121,32 @@ def my_visits(token: Token, offset: int = Query(0, ge=0), limit: int = Query(20,
                                    "p_estado_pendiente": get_settings().initial_visit_state}).execute().data
 
 
-@app.get("/")
+@app.get("/", include_in_schema=False)
 def welcome():
     return FileResponse(ROOT / "static" / "inicio.html")
 
 
-@app.get("/inmuebles/{token}")
+@app.get("/inmuebles/{token}", include_in_schema=False)
 def catalog_page(token: str):
     return FileResponse(ROOT / "static" / "catalogo.html")
 
 
-@app.get("/inmuebles/{token}/propiedad/{property_id}")
+@app.get("/inmuebles/{token}/propiedad/{property_id}", include_in_schema=False)
 def detail_page(token: str, property_id: int):
     return FileResponse(ROOT / "static" / "detalle.html")
 
 
-@app.get("/inmuebles/{token}/propiedad/{property_id}/solicitar")
+@app.get("/inmuebles/{token}/propiedad/{property_id}/solicitar", include_in_schema=False)
 def request_page(token: str, property_id: int):
     return FileResponse(ROOT / "static" / "solicitar-visita.html")
 
 
-@app.get("/inmuebles/{token}/mis-visitas")
+@app.get("/inmuebles/{token}/mis-visitas", include_in_schema=False)
 def visits_page(token: str):
     return FileResponse(ROOT / "static" / "mis-visitas.html")
 
 
-@app.get("/inmuebles/{token}/confirmacion/{visit_id}")
+@app.get("/inmuebles/{token}/confirmacion/{visit_id}", include_in_schema=False)
 def confirmation_page(token: str, visit_id: int):
     return FileResponse(ROOT / "static" / "confirmacion.html")
 
