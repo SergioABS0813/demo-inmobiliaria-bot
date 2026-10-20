@@ -10,12 +10,13 @@ export function el(tag, attrs = {}, ...children) {
   return node;
 }
 export const money = (value,currency) => {
+  if(value===null||value===undefined||!currency)return 'Precio a consultar';
   const code = ({'S/':'PEN','S/.':'PEN','$':'USD','US$':'USD'})[currency] || currency;
   try { return new Intl.NumberFormat('es-PE',{style:'currency',currency:code,maximumFractionDigits:0}).format(Number(value)); }
   catch { return `${currency} ${Number(value).toLocaleString('es-PE')}`; }
 };
 export const area = value => value == null ? 'No indicada' : `${Number(value).toLocaleString('es-PE')} m²`;
-export const dateText = value => new Intl.DateTimeFormat('es-PE',{dateStyle:'long',timeStyle:'short',timeZone:'America/Lima'}).format(new Date(value));
+export const dateText = value => value ? new Intl.DateTimeFormat('es-PE',{dateStyle:'long',timeStyle:'short',timeZone:'America/Lima'}).format(new Date(value)) : 'Por coordinar';
 export function photo(url, alt, {lazy=true, thumb=false}={}) {
   let src = '/static/img/placeholder.svg';
   try {
@@ -45,7 +46,10 @@ export function state(container, title, text, retry) {
   if (retry) content.append(el('button',{class:'btn',type:'button',onclick:retry},'Volver a intentar'));
   container.replaceChildren(content);
 }
-export function fail(container,error,retry) {state(container,error.status===404?'No encontramos este enlace':'No pudimos cargar la información',error.message,error.status===404?null:retry);}
+export function fail(container,error,retry) {const invalid=[401,403,404].includes(error.status);state(container,invalid?'Acceso no disponible':'No pudimos cargar la información',error.message,invalid?null:retry);}
+export function existingVisit(container,id) {
+  container.replaceChildren(el('h2',{},'Ya recibimos tu solicitud'),el('p',{class:'notice'},'Esta oportunidad ya tiene una visita solicitada. Puedes seguir explorando propiedades; las visitas adicionales se coordinan directamente con tu asesor.'),el('a',{class:'btn teal',href:id?`${base}/confirmacion/${id}`:`${base}/mis-visitas`},'Consultar mi solicitud'));
+}
 export function shell(active='catalogo') {
   const header=document.getElementById('header');
   const back=document.getElementById('back');if(back)back.href=base;

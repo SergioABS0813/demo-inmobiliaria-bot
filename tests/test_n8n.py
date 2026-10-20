@@ -4,7 +4,10 @@ import json
 from pathlib import Path
 import unittest
 
-spec = importlib.util.spec_from_file_location('link_adapter', Path(__file__).resolve().parents[1] / 'n8n/adaptar_enviar_link.py')
+adapter_path = Path(__file__).resolve().parents[1] / 'n8n/adaptar_enviar_link.py'
+if not adapter_path.is_file():
+    raise unittest.SkipTest('Pruebas históricas del generador n8n retirado; no se genera ningún workflow en esta adaptación.')
+spec = importlib.util.spec_from_file_location('link_adapter', adapter_path)
 adapter = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(adapter)
 

@@ -18,6 +18,8 @@ class DocumentationTests(unittest.TestCase):
         self.assertTrue(all(path.startswith('/api/') for path in schema['paths']))
         parameters = schema['paths']['/api/lead/contexto']['get']['parameters']
         self.assertTrue(any(p['name']=='X-Lead-Token' and p['in']=='header' for p in parameters))
+        self.assertTrue(any(p['name']=='X-Opportunity-Token' and p['in']=='header' for p in parameters))
+        self.assertIn('/api/visitas/actual',schema['paths'])
 
     def test_documentation_assets_and_inline_scripts_are_allowed(self):
         for path in ('/docs', '/redoc'):

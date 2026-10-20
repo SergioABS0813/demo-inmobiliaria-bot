@@ -1,5 +1,5 @@
 import {api,base,propertyId} from './api.js';
-import {el,shell,photo,images,money,fail,finish} from './utils.js';
+import {el,shell,photo,images,money,fail,finish,existingVisit} from './utils.js';
 shell();
 const form=document.getElementById('request-form'),panel=document.getElementById('property-summary');
 const error=document.getElementById('form-error'),fields=document.getElementById('request-fields'),submit=document.getElementById('submit');
@@ -9,12 +9,13 @@ function todayLima(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/L
 async function load(){
   try{
     const [p,context]=await Promise.all([api(`/propiedades/${propertyId}`),api('/lead/contexto')]);
+    if(context.visita_id){existingVisit(form,context.visita_id);panel.hidden=true;return;}
     if(!p.disponible){form.hidden=true;panel.replaceChildren(el('p',{class:'error'},'Esta propiedad ya no está disponible para nuevas visitas.'));return;}
     panel.replaceChildren(photo(images(p)[0]?.url,p.titulo,{lazy:false}),el('div',{},el('span',{class:'pill'},p.tipo_operacion),el('h2',{},p.titulo),el('p',{class:'muted'},p.distrito),el('strong',{class:'detail-price'},money(p.precio,p.moneda))));
     form.elements.nombre.value=context.nombre||'';
     document.getElementById('privacy-contact').textContent=context.privacy_contact?`Para consultas sobre tus datos: ${context.privacy_contact}.`:'Esta demo no debe recibir datos reales hasta que la inmobiliaria configure su contacto de privacidad.';
     form.elements.fecha.min=todayLima();fields.disabled=false;
-    // Consent is intentionally unchecked, even if previously given.
+    // The acknowledgement is request-only; the new leads schema has no consent columns.
   }catch(err){form.hidden=true;fail(panel,err,()=>{form.hidden=false;load();});}finally{finish(panel);}
 }
 function showError(text){error.textContent=text;error.hidden=false;error.focus();}
@@ -41,6 +42,12 @@ form.addEventListener('submit',async event=>{
     const result=await api('/visitas',{method:'POST',body:{...payload,request_id:requestId}});
     try{sessionStorage.removeItem(storageKey);}catch{}
     location.replace(`${base}/confirmacion/${result.id}`);
-  }catch(err){showError(err.message);sending=false;fields.disabled=false;submit.textContent='Enviar solicitud de visita';}
+  }catch(err){
+    if(err.detail?.code==='visita_existente'){
+      try{sessionStorage.removeItem(storageKey);}catch{}
+      existingVisit(form,err.detail.visita_id);return;
+    }
+    showError(err.message);sending=false;fields.disabled=false;submit.textContent='Enviar solicitud de visita';
+  }
 });
 load();

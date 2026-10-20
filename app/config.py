@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     supabase_url: str
     supabase_secret_key: str
     initial_visit_state: str = "Pendiente de coordinación"
+    requested_opportunity_state: str = "visita_solicitada"
     privacy_contact: str
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

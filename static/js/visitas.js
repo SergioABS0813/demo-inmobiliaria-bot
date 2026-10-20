@@ -6,11 +6,10 @@ let offset=0,revision=0,controller;
 function visitCard(v){
   const property=v.propiedades;
   const body=el('div',{class:'visit-body'},el('span',{class:'pill'},v.estados_visita?.nombre || 'Estado no indicado'),
-    el('h2',{},property?.titulo || 'Propiedad no disponible'),el('p',{class:'muted'},v.nombre||`Solicitud ${v.id}`),
+    el('h2',{},property?.titulo || 'Propiedad no disponible'),el('p',{class:'muted'},`Solicitud #${v.id}${v.es_oportunidad_actual?' · Oportunidad actual':''}`),
     el('p',{},el('strong',{},'Fecha solicitada: '),dateText(v.fecha_cliente)));
   if(v.fecha_acordada)body.append(el('p',{},el('strong',{},'Fecha acordada: '),dateText(v.fecha_acordada)));
   else body.append(el('p',{class:'muted'},'La fecha definitiva todavía requiere coordinación.'));
-  if(v.motivo)body.append(el('p',{class:'notice'},v.motivo));
   if(property)body.append(el('a',{class:'btn text',href:`${base}/propiedad/${property.id}`},'Ver inmueble ↗'));
   return el('article',{class:'card visit'},photo(images(property||{})[0]?.url,property?.titulo||'Inmueble solicitado'),body);
 }
@@ -24,7 +23,7 @@ async function load(append=false){
       if(current!==revision)return;
       const pending=!v.fecha_acordada;
       const content=el('section',{class:'card confirmation'},el('div',{class:'success-mark','aria-hidden':'true'},'✓'),
-        el('span',{class:'eyebrow'},v.nombre||'Tu solicitud'),el('h1',{},'Hemos recibido tu solicitud'),
+        el('span',{class:'eyebrow'},`Solicitud #${v.id}`),el('h1',{},'Hemos recibido tu solicitud'),
         el('p',{class:'muted'},'Gracias por dar el siguiente paso. Consulta aquí la información actual de tu solicitud.'),
         el('div',{class:'summary'},el('h2',{},v.propiedades?.titulo||'Inmueble solicitado'),
           el('p',{},'Fecha solicitada: ',el('strong',{},dateText(v.fecha_cliente))),

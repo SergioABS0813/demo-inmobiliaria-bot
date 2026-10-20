@@ -4,7 +4,7 @@ export const base = token ? `/inmuebles/${encodeURIComponent(token)}` : '/';
 export const propertyId = segments[2] === 'propiedad' ? Number(segments[3]) : null;
 
 export class ApiError extends Error {
-  constructor(message, status) { super(message); this.status = status; }
+  constructor(message, status, detail=null) { super(message); this.status = status; this.detail=detail; }
 }
 export async function api(path, {signal, body, method = 'GET'} = {}) {
   const controller = new AbortController();
@@ -14,13 +14,13 @@ export async function api(path, {signal, body, method = 'GET'} = {}) {
   const timer = setTimeout(abort, 18000);
   try {
     const response = await fetch(`/api${path}`, {
-      method, headers: {'X-Lead-Token':token || '', ...(body ? {'Content-Type':'application/json'} : {})},
+      method, headers: {'X-Opportunity-Token':token || '', ...(body ? {'Content-Type':'application/json'} : {})},
       body:body ? JSON.stringify(body) : undefined, signal:controller.signal, cache:'no-store', credentials:'omit',
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const text = typeof data.detail === 'string' ? data.detail : 'Revisa los campos e inténtalo de nuevo.';
-      throw new ApiError(text, response.status);
+      const text = typeof data.detail === 'string' ? data.detail : data.detail?.mensaje || 'Revisa los campos e inténtalo de nuevo.';
+      throw new ApiError(text, response.status, data.detail);
     }
     return data;
   } catch (error) {

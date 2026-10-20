@@ -20,6 +20,31 @@ class VisitIn(BaseModel):
         return value
 
 
+class OpportunityContextOut(BaseModel):
+    nombre: str | None
+    estado_oportunidad: str
+    visita_id: int | None
+    puede_solicitar: bool
+    privacy_contact: str
+
+
+class VisitCreatedOut(BaseModel):
+    id: int
+    replayed: bool
+
+
+class VisitOut(BaseModel):
+    id: int
+    oportunidad_id: int
+    fecha_cliente: datetime | None = None
+    fecha_agente: datetime | None = None
+    fecha_acordada: datetime | None = None
+    estado_id: int | None = None
+    estados_visita: dict | None = None
+    propiedades: dict | None = None
+    es_oportunidad_actual: bool
+
+
 class PropertyOut(BaseModel):
     id: int
     titulo: str
@@ -31,7 +56,7 @@ class PropertyOut(BaseModel):
     distrito: str | None = None
     distrito_id: int | None = None
     moneda: str
-    precio: Decimal
+    precio: Decimal | None
     cantidad_dormitorios: int | None = None
     cantidad_banos: int | None = None
     cocheras: int | None = None

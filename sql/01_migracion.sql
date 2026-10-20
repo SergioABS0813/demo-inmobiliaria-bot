@@ -1,3 +1,6 @@
+-- HISTÓRICA: modelo anterior. NO ejecutar contra el esquema de oportunidades.
+-- Para la arquitectura actual utilizar 00_diagnostico.sql y 02_oportunidades.sql.
+-- Se conserva como referencia histórica; no forma parte del despliegue actual.
 -- NO aplicada automáticamente. Requiere revisar 00_diagnostico.sql y README.
 -- Contrato: IDs enteros, fecha_cliente/agente/acordada y consentimiento_at
 -- timestamptz, token_uuid UUID, nombre de visita = código visible de solicitud.
