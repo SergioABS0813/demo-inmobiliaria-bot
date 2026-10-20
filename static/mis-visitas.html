@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="Raíz Urbana Inmobiliaria. Explora inmuebles en Lima y solicita una visita con atención personalizada.">
+<title>Mis visitas · Raíz Urbana</title>
+<link rel="icon" href="/static/img/placeholder.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="/static/css/base.css">
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+<header class="site-header" id="header">
+</header>
+<main class="container" id="main">
+<div class="section-head page-title">
+<div>
+<span class="eyebrow">Cada paso, más cerca</span>
+<h1>Mis visitas</h1>
+<p class="lead">Consulta tus solicitudes y las fechas coordinadas con tu asesor.</p>
+</div>
+<button class="btn secondary" id="refresh">Actualizar estados ↻</button>
+</div>
+<p class="notice visits-note">Una fecha solicitada todavía no es una fecha confirmada. Todas las horas se muestran en horario de Lima.</p>
+<p class="muted" id="refresh-status" role="status">
+</p>
+<div class="visits-list" id="visits" aria-busy="true">
+<div class="skeleton">
+</div>
+</div>
+<div class="pagination">
+<button class="btn secondary" id="more" hidden>Ver más solicitudes</button>
+</div>
+</main>
+<footer class="footer" id="footer">
+</footer>
+<noscript>
+<p class="error">Necesitas activar JavaScript para consultar el catálogo y enviar solicitudes.</p>
+</noscript>
+<script type="module" src="/static/js/visitas.js">
+</script>
+</body>
+</html>

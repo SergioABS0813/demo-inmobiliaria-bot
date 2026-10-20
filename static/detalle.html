@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="Raíz Urbana Inmobiliaria. Explora inmuebles en Lima y solicita una visita con atención personalizada.">
+<title>Detalle del inmueble · Raíz Urbana</title>
+<link rel="icon" href="/static/img/placeholder.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="/static/css/base.css">
+<link rel="stylesheet" href="/static/css/detalle.css">
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+<header class="site-header" id="header">
+</header>
+<main class="container" id="main">
+<nav class="breadcrumb" aria-label="Ruta">
+<a id="back" href="/">Propiedades</a>
+<span aria-hidden="true">/</span>
+<span>Detalle del inmueble</span>
+</nav>
+<div id="detail" aria-busy="true">
+<div class="skeleton wide">
+</div>
+</div>
+</main>
+<footer class="footer" id="footer">
+</footer>
+<dialog id="photo-dialog" aria-labelledby="photo-title">
+<div class="dialog-bar">
+<span id="photo-title">Galería de la propiedad</span>
+<div class="dialog-controls">
+<button type="button" class="icon-btn" id="photo-prev" aria-label="Fotografía anterior">‹</button>
+<span id="photo-position" role="status">
+</span>
+<button type="button" class="icon-btn" id="photo-next" aria-label="Fotografía siguiente">›</button>
+<button type="button" class="icon-btn" id="photo-close" aria-label="Cerrar galería" autofocus>×</button>
+</div>
+</div>
+<div id="full-photo">
+</div>
+</dialog>
+<noscript>
+<p class="error">Necesitas activar JavaScript para consultar el catálogo y enviar solicitudes.</p>
+</noscript>
+<script type="module" src="/static/js/detalle.js">
+</script>
+</body>
+</html>

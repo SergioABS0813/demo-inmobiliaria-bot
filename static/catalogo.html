@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="Raíz Urbana Inmobiliaria. Explora inmuebles en Lima y solicita una visita con atención personalizada.">
+<title>Propiedades · Raíz Urbana</title>
+<link rel="icon" href="/static/img/placeholder.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="/static/css/base.css">
+<link rel="stylesheet" href="/static/css/catalogo.css">
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+<header class="site-header" id="header">
+</header>
+<main id="main">
+<section class="hero">
+<div class="container hero-inner">
+<div class="hero-copy">
+<span class="eyebrow" id="welcome">Tu próxima etapa empieza aquí</span>
+<h1>Encuentra el espacio ideal para tu <em>próxima etapa.</em>
+</h1>
+<p class="lead">Un hogar para vivir. Un espacio para crecer. Descubre opciones de compra, alquiler e inversión en Lima.</p>
+<div class="hero-note">
+<span aria-hidden="true">✓</span> Propiedades para descubrir · Atención personalizada</div>
+</div>
+<div class="hero-art" aria-hidden="true">
+<div class="architecture">
+<div class="tower">
+</div>
+<div class="tower">
+</div>
+<div class="tower">
+</div>
+</div>
+<span class="art-caption">RAÍZ URBANA · LIMA, PERÚ</span>
+</div>
+</div>
+</section>
+<div class="container">
+<section class="card filters" aria-labelledby="filters-heading">
+<form id="filters">
+<fieldset id="filter-fieldset" disabled>
+<div class="filters-title">
+<h2 id="filters-heading">¿Qué espacio estás buscando?</h2>
+<button class="btn text" type="button" id="extra-toggle" aria-expanded="false" aria-controls="extra">Más filtros +</button>
+</div>
+<div class="filter-main">
+<label class="label">Operación<select name="tipo_operacion">
+<option value="">Comprar o alquilar</option>
+</select>
+</label>
+<label class="label">Tipo de inmueble<select name="tipo_inmueble">
+<option value="">Todos los inmuebles</option>
+</select>
+</label>
+<label class="label">Distrito<select name="distrito_id">
+<option value="">Todos los distritos</option>
+</select>
+</label>
+</div>
+<div class="filter-extra" id="extra" hidden>
+<label class="label">Moneda<select name="moneda">
+<option value="">Todas las monedas</option>
+</select>
+</label>
+<label class="label">Precio mínimo<input name="precio_min" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Desde">
+</label>
+<label class="label">Precio máximo<input name="precio_max" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Hasta">
+</label>
+<label class="label">Dormitorios mínimos<select name="dormitorios_min">
+<option value="">Cualquiera</option>
+<option value="1">1 o más</option>
+<option value="2">2 o más</option>
+<option value="3">3 o más</option>
+<option value="4">4 o más</option>
+</select>
+</label>
+</div>
+<p id="filter-error" role="alert">
+</p>
+<div class="filter-actions">
+<small>Encuentra un lugar que se sienta tuyo.</small>
+<div class="filter-buttons">
+<button class="btn secondary" id="clear" type="button">Limpiar</button>
+<button class="btn teal" type="submit">Buscar propiedades ↗</button>
+</div>
+</div>
+</fieldset>
+</form>
+</section>
+<div class="section-head">
+<div>
+<span class="eyebrow">Espacios con posibilidades</span>
+<h2>Explora tu próximo hogar</h2>
+<p class="catalog-note" id="result-status" role="status">Consultando propiedades disponibles…</p>
+</div>
+<span class="catalog-note">Encuentra. Conoce. Decide.</span>
+</div>
+<div class="grid" id="results" aria-busy="true">
+<div class="skeleton">
+</div>
+<div class="skeleton">
+</div>
+<div class="skeleton">
+</div>
+</div>
+<div class="pagination">
+<button class="btn secondary" id="more" hidden>Ver más propiedades</button>
+</div>
+</div>
+</main>
+<footer class="footer" id="footer">
+</footer>
+<noscript>
+<p class="error">Necesitas activar JavaScript para consultar el catálogo y enviar solicitudes.</p>
+</noscript>
+<script type="module" src="/static/js/catalogo.js">
+</script>
+</body>
+</html>
