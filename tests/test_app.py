@@ -80,6 +80,17 @@ class Rules(unittest.TestCase):
         self.assertEqual(response.status_code,200);self.assertEqual(self.db.queries[0][0],'oportunidades')
         self.assertEqual(response.json()['telefono'],'51999999999')
         for field in ('id','lead_id','user_id','token_uuid','consentimiento'):self.assertNotIn(field,response.json())
+    def test_phone_is_normalized_and_saved_with_visit(self):
+        payload=self.payload();payload['telefono']='+51 999 999 999'
+        response=self.client.post('/api/visitas',headers=self.headers,json=payload)
+        self.assertEqual(response.status_code,201)
+        self.assertEqual(self.db.calls[0][0],'ru_solicitar_visita_contacto')
+        self.assertEqual(self.db.calls[0][1]['p_telefono'],'+51999999999')
+    def test_username_is_not_accepted_as_contact_phone(self):
+        payload=self.payload();payload['telefono']='usuario_meta'
+        response=self.client.post('/api/visitas',headers=self.headers,json=payload)
+        self.assertEqual(response.status_code,422)
+        self.assertEqual(self.db.calls,[])
     def test_closed_outcome_rejected(self):
         self.db.opportunities[0]['resultado']='ganada'
         self.assertEqual(self.client.get('/api/propiedades',headers=self.headers).status_code,403)

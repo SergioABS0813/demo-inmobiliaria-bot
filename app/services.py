@@ -41,7 +41,7 @@ def validate_timezone(value):
 
 
 def request_fingerprint(body):
-    data = body.model_dump(mode="json", exclude={"request_id"})
+    data = body.model_dump(mode="json", exclude={"request_id"}, exclude_none=True)
     data["fecha_cliente"] = body.fecha_cliente.astimezone(timezone.utc).isoformat()
     return sha256(json.dumps(data, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
@@ -61,14 +61,19 @@ def create_visit(db, token, body):
         raise existing_visit_error(existing["id"])
     # Future-date validation is inside the RPC, AFTER replay lookup. A retry of
     # an already accepted request must work even after its requested time passes.
-    result = db.rpc("ru_solicitar_visita_oportunidad", {
+    params = {
         "p_token": str(token), "p_propiedad_id": body.propiedad_id,
         "p_nombre": body.nombre, "p_fecha": body.fecha_cliente.isoformat(),
         "p_consentimiento": body.consentimiento, "p_request_id": str(body.request_id),
         "p_request_hash": fingerprint,
         "p_estado_nombre": get_settings().initial_visit_state,
         "p_estado_oportunidad": get_settings().requested_opportunity_state,
-    }).execute().data
+    }
+    rpc_name = "ru_solicitar_visita_oportunidad"
+    if body.telefono is not None:
+        params["p_telefono"] = body.telefono
+        rpc_name = "ru_solicitar_visita_contacto"
+    result = db.rpc(rpc_name, params).execute().data
     return result
 
 

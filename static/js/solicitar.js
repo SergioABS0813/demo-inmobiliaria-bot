@@ -29,7 +29,7 @@ form.addEventListener('submit',async event=>{
   const data=new FormData(form);
   const date=`${data.get('fecha')}T${data.get('hora')}:00-05:00`;
   if(!Number.isFinite(Date.parse(date))||Date.parse(date)<=Date.now()){showError('Elige una fecha y hora futuras en Lima.');form.elements.fecha.focus();return;}
-  const payload={propiedad_id:propertyId,nombre:String(data.get('nombre')).trim(),fecha_cliente:date,consentimiento:data.get('consentimiento')==='on'};
+  const payload={propiedad_id:propertyId,nombre:String(data.get('nombre')).trim(),telefono:String(data.get('telefono')).trim(),fecha_cliente:date,consentimiento:data.get('consentimiento')==='on'};
   if(payload.nombre.length<3||!/[\p{L}]/u.test(payload.nombre)){showError('Indica tu nombre completo.');return;}
   const serialized=JSON.stringify(payload);
   if(event.submitter!==confirm||reviewedPayload!==serialized){

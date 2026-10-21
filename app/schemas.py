@@ -8,9 +8,23 @@ class VisitIn(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     propiedad_id: int = Field(gt=0)
     nombre: str = Field(min_length=3, max_length=120)
+    telefono: str | None = Field(default=None, min_length=7, max_length=25)
     fecha_cliente: datetime
     consentimiento: bool
     request_id: UUID
+
+    @field_validator("telefono")
+    @classmethod
+    def valid_phone(cls, value):
+        if value is None:
+            return value
+        import re
+        if not re.fullmatch(r"\+?[0-9 ()-]+", value):
+            raise ValueError("Indica un numero de WhatsApp valido.")
+        digits = re.sub(r"[^0-9]", "", value)
+        if not 7 <= len(digits) <= 15:
+            raise ValueError("El telefono debe tener entre 7 y 15 digitos.")
+        return ("+" if value.startswith("+") else "") + digits
 
     @field_validator("nombre")
     @classmethod
