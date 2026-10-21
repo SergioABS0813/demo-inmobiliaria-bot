@@ -27,6 +27,8 @@ function showError(text){editRequest();error.textContent=text;error.hidden=false
 form.addEventListener('submit',async event=>{
   event.preventDefault();if(sending)return;
   const data=new FormData(form);
+  const hourValue=String(data.get('hora'));
+  if(hourValue<'09:00'||hourValue>'19:00'){showError('Elige una hora entre las 9:00 a. m. y las 7:00 p. m. (Lima).');form.elements.hora.focus();return;}
   const date=`${data.get('fecha')}T${data.get('hora')}:00-05:00`;
   if(!Number.isFinite(Date.parse(date))||Date.parse(date)<=Date.now()){showError('Elige una fecha y hora futuras en Lima.');form.elements.fecha.focus();return;}
   const payload={propiedad_id:propertyId,nombre:String(data.get('nombre')).trim(),telefono:String(data.get('telefono')).trim(),fecha_cliente:date,consentimiento:data.get('consentimiento')==='on'};

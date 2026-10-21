@@ -12,12 +12,14 @@ from .schemas import VisitIn, PropertyOut, OpportunityContextOut, VisitCreatedOu
 from .services import require_opportunity, current_visit, create_visit, normalize_property
 from .docs import install_documentation
 from .admin import router as admin_router
+from .agents import router as agents_router
 
 ROOT = Path(__file__).resolve().parent.parent
 # Custom documentation routes allow their CDN assets without relaxing the site CSP.
 app = FastAPI(title="Raíz Urbana", docs_url=None, redoc_url=None, openapi_url="/openapi.json")
 install_documentation(app)
 app.include_router(admin_router)
+app.include_router(agents_router)
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 def read_token(
     value: Annotated[str | None, Header(alias="X-Opportunity-Token", description="Token UUID de la oportunidad abierta")] = None,

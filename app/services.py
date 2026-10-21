@@ -1,4 +1,4 @@
-from datetime import timedelta, timezone
+from datetime import time, timedelta, timezone
 from hashlib import sha256
 import json
 from fastapi import HTTPException
@@ -59,6 +59,9 @@ def create_visit(db, token, body):
                 raise HTTPException(409, "Esta clave de solicitud ya se utilizó con otros datos.")
             return {"id": existing["id"], "replayed": True}
         raise existing_visit_error(existing["id"])
+    local_time = body.fecha_cliente.astimezone(LIMA).time()
+    if not time(9) <= local_time <= time(19):
+        raise HTTPException(422, "Elige una hora entre las 9:00 a. m. y las 7:00 p. m. (Lima).")
     # Future-date validation is inside the RPC, AFTER replay lookup. A retry of
     # an already accepted request must work even after its requested time passes.
     params = {

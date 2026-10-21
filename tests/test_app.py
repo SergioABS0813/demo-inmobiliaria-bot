@@ -59,7 +59,7 @@ class Rules(unittest.TestCase):
         self.headers={'X-Opportunity-Token':self.db.token}
     def tearDown(self):app.dependency_overrides.clear()
     def payload(self):
-        return {'propiedad_id':1,'nombre':'Ana Pérez','fecha_cliente':(datetime.now(LIMA)+timedelta(days=2)).isoformat(),
+        return {'propiedad_id':1,'nombre':'Ana Pérez','fecha_cliente':(datetime.now(LIMA)+timedelta(days=2)).replace(hour=12,minute=0,second=0,microsecond=0).isoformat(),
                 'consentimiento':True,'request_id':str(uuid4())}
     def test_missing_token_rejected(self):
         self.assertEqual(self.client.get('/api/lead/contexto').status_code,401)
@@ -91,6 +91,15 @@ class Rules(unittest.TestCase):
         response=self.client.post('/api/visitas',headers=self.headers,json=payload)
         self.assertEqual(response.status_code,422)
         self.assertEqual(self.db.calls,[])
+    def test_visit_hours_boundaries(self):
+        for hour, minute, second, expected in [(8,59,0,422),(9,0,0,201),(19,0,0,201),(19,0,1,422),(19,1,0,422)]:
+            with self.subTest(hour=hour,minute=minute,second=second):
+                self.db.calls.clear()
+                payload=self.payload()
+                payload['fecha_cliente']=(datetime.now(LIMA)+timedelta(days=2)).replace(hour=hour,minute=minute,second=second,microsecond=0).isoformat()
+                response=self.client.post('/api/visitas',headers=self.headers,json=payload)
+                self.assertEqual(response.status_code,expected)
+                if expected==422:self.assertEqual(self.db.calls,[])
     def test_closed_outcome_rejected(self):
         self.db.opportunities[0]['resultado']='ganada'
         self.assertEqual(self.client.get('/api/propiedades',headers=self.headers).status_code,403)

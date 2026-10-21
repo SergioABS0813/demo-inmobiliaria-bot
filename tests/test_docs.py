@@ -15,7 +15,7 @@ class DocumentationTests(unittest.TestCase):
         self.assertIn('/api/visitas', schema['paths'])
         self.assertIn('post', schema['paths']['/api/visitas'])
         self.assertIn('VisitIn', schema['components']['schemas'])
-        self.assertTrue(all(path.startswith('/api/') for path in schema['paths']))
+        self.assertTrue(all(path.startswith('/api/') or path == '/agente/{token_uuid}' for path in schema['paths']))
         parameters = schema['paths']['/api/lead/contexto']['get']['parameters']
         self.assertTrue(any(p['name']=='X-Lead-Token' and p['in']=='header' for p in parameters))
         self.assertTrue(any(p['name']=='X-Opportunity-Token' and p['in']=='header' for p in parameters))
