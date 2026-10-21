@@ -65,12 +65,15 @@ export function shell(active='catalogo') {
 }
 export function card(p) {
   const href=`${base}/propiedad/${p.id}`;
-  const specs=[p.area_total!=null?area(p.area_total):null,p.cantidad_dormitorios!=null?`${p.cantidad_dormitorios} dorm.`:null,
-    p.cantidad_banos!=null?`${p.cantidad_banos} baños`:null,p.cocheras>0?`${p.cocheras} cochera(s)`:null].filter(Boolean);
+  const specs=[
+    p.cantidad_dormitorios!=null?`${p.cantidad_dormitorios} dorm.`:null,
+    p.cantidad_banos!=null?`${p.cantidad_banos} baños`:null,
+    p.area_total!=null?area(p.area_total):null
+  ].filter(Boolean);
   return el('article',{class:'card property'},
-    el('a',{class:'property-image',href,tabindex:'-1','aria-hidden':'true'},photo(images(p)[0]?.url,p.titulo),el('span',{class:'pill'},p.tipo_operacion)),
-    el('div',{class:'property-body'},el('div',{class:'property-price'},money(p.precio,p.moneda)),
-      el('h3',{},el('a',{href},p.titulo)),el('p',{class:'property-location'},p.distrito || 'Distrito no indicado'),
+    el('a',{class:'property-image',href,tabindex:'-1','aria-hidden':'true'},photo(images(p)[0]?.url,p.titulo)),
+    el('div',{class:'property-body'},
+      el('h3',{},el('a',{href},p.titulo || 'Inmueble disponible')),
       el('div',{class:'features'},specs.map(s=>el('span',{},s))),
       el('a',{class:'property-link',href},'Ver propiedad',el('span',{'aria-hidden':'true'},'↗'))));
 }
