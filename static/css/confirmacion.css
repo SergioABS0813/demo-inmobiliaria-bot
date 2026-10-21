@@ -1,0 +1,24 @@
+.confirmation-page .confirmation{max-width:760px;margin:24px auto;padding:24px 28px;border-radius:18px}
+.confirmation-page .success-mark{width:44px;height:44px;font-size:23px;margin:0 auto 12px}
+.confirmation-page .confirmation h1{font-size:clamp(1.45rem,2.6vw,1.85rem);line-height:1.25;letter-spacing:-.035em;margin:10px 0}
+.confirmation-page .confirmation>p{font-size:13px;line-height:1.6;margin:10px 0}
+.confirmation-page .confirmation .summary{padding:14px 0;margin:16px 0}
+.confirmation-page .summary h2{font-size:18px;line-height:1.35;margin:0 0 10px;overflow-wrap:anywhere}
+.confirmation-page .summary p{font-size:13px;line-height:1.55;margin:5px 0}
+.confirmation-page .summary .pill{padding:5px 9px;font-size:10px;margin-top:6px}
+.confirmation-page .confirmation .notice{padding:12px 14px;font-size:12px;line-height:1.6}
+.confirmation-page .actions{margin-top:16px;gap:10px}
+.confirmation-page .actions .btn{min-height:44px;padding:10px 16px;font-size:12px}
+body:has(.confirmation-page) .footer{margin-top:24px;padding:20px 0}
+@media(max-width:640px){
+  .confirmation-page .confirmation{margin:16px auto;padding:20px 18px;border-radius:16px}
+  .confirmation-page .success-mark{width:38px;height:38px;font-size:21px;margin-bottom:10px}
+  .confirmation-page .confirmation h1{font-size:23px}
+  .confirmation-page .summary h2{font-size:17px}
+  .confirmation-page .actions .btn{width:auto;flex:1 1 170px}
+}
+@media(max-height:750px) and (min-width:641px){
+  .confirmation-page .confirmation{margin:16px auto;padding:18px 24px}
+  .confirmation-page .success-mark{width:36px;height:36px;font-size:20px;margin-bottom:8px}
+  .confirmation-page .confirmation .summary{padding:12px 0;margin:12px 0}
+}
