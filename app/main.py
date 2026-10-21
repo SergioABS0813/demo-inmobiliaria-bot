@@ -91,7 +91,7 @@ def health():
 def context(token: Token, db=Depends(get_db)):
     opportunity = require_opportunity(db, token)
     visit = current_visit(db, opportunity["id"])
-    return {"nombre": opportunity["leads"]["nombre"], "estado_oportunidad": opportunity["estado_oportunidad"]["nombre"],
+    return {"nombre": opportunity["leads"]["nombre"], "telefono": opportunity["leads"].get("telefono"), "estado_oportunidad": opportunity["estado_oportunidad"]["nombre"],
             "visita_id": visit["id"] if visit else None, "puede_solicitar": visit is None,
             "privacy_contact": get_settings().privacy_contact}
 

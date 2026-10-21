@@ -75,9 +75,11 @@ class Rules(unittest.TestCase):
         response=self.client.get('/api/lead/contexto',headers={**self.headers,'X-Lead-Token':str(uuid4())})
         self.assertEqual(response.status_code,400)
     def test_context_privacy_and_token_resolution(self):
+        self.db.opportunities[0]['leads']['telefono']='51999999999'
         response=self.client.get('/api/lead/contexto',headers=self.headers)
         self.assertEqual(response.status_code,200);self.assertEqual(self.db.queries[0][0],'oportunidades')
-        for field in ('id','lead_id','user_id','telefono','token_uuid','consentimiento'):self.assertNotIn(field,response.json())
+        self.assertEqual(response.json()['telefono'],'51999999999')
+        for field in ('id','lead_id','user_id','token_uuid','consentimiento'):self.assertNotIn(field,response.json())
     def test_closed_outcome_rejected(self):
         self.db.opportunities[0]['resultado']='ganada'
         self.assertEqual(self.client.get('/api/propiedades',headers=self.headers).status_code,403)

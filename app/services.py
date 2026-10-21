@@ -10,7 +10,7 @@ LIMA = timezone(timedelta(hours=-5), "America/Lima")
 def require_opportunity(db, token):
     """The capability belongs to an OPEN opportunity, never to leads."""
     rows = (db.table("oportunidades")
-            .select("id,lead_id,estado_id,resultado,fecha_cierre,leads(id,nombre),estado_oportunidad(nombre)")
+            .select("id,lead_id,estado_id,resultado,fecha_cierre,leads(id,nombre,telefono),estado_oportunidad(nombre)")
             .eq("token_uuid", str(token)).limit(2).execute().data)
     if not rows:
         raise HTTPException(404, "El enlace no es válido. Solicita uno nuevo por WhatsApp.")

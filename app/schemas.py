@@ -22,6 +22,7 @@ class VisitIn(BaseModel):
 
 class OpportunityContextOut(BaseModel):
     nombre: str | None
+    telefono: str | None = None
     estado_oportunidad: str
     visita_id: int | None
     puede_solicitar: bool
