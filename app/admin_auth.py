@@ -11,8 +11,8 @@ basic = HTTPBasic(auto_error=False)
 def require_admin(credentials: Annotated[HTTPBasicCredentials | None, Depends(basic)]):
     settings = get_settings()
     password = settings.admin_password.get_secret_value() if settings.admin_password else ''
-    if len(password)<16 or not settings.admin_username:
-        raise HTTPException(503,'El panel administrativo está deshabilitado. Configura ADMIN_USERNAME y ADMIN_PASSWORD (mínimo 16 caracteres).')
+    if not password or not settings.admin_username:
+        raise HTTPException(503,'El panel administrativo está deshabilitado. Configura ADMIN_USERNAME y ADMIN_PASSWORD en el .env del proyecto y reinicia el backend.')
     username = credentials.username if credentials else ''
     supplied = credentials.password if credentials else ''
     good_user = secrets.compare_digest(username.encode(), settings.admin_username.encode())

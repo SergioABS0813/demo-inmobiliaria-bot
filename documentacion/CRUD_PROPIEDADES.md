@@ -11,7 +11,7 @@ Ruta: **`/agente/propiedades`**. Herramienta interna para cargar la demo. No se 
 
 ```text
 ADMIN_USERNAME=agente
-ADMIN_PASSWORD=CONFIGURAR_UNA_CONTRASEÑA_ALEATORIA_DE_AL_MENOS_16_CARACTERES
+ADMIN_PASSWORD=TU_CONTRASEÑA
 ```
 
 El valor mostrado es una indicación, no una contraseña para usar. Configurar un secreto propio. `.env` no fue modificado ni se copian credenciales a JavaScript. No se necesita una clave de Storage adicional.
@@ -28,7 +28,7 @@ docker compose up --build
 
 Abrir `https://raizurbana.bestsolperu.com/agente/propiedades` después de desplegar. Para desarrollo local, `http://localhost:8001/agente/propiedades`.
 
-El navegador solicita usuario y contraseña mediante HTTP Basic. El panel, consultas y escrituras administrativas verifican la credencial en FastAPI. Sin contraseña configurada de al menos 16 caracteres, el panel queda deshabilitado (503); sin credenciales válidas, 401. Los tokens de agentes/oportunidades no se reutilizan como credenciales administrativas.
+El navegador solicita usuario y contraseña mediante HTTP Basic. El panel, consultas y escrituras administrativas verifican la credencial en FastAPI. Si faltan el usuario o la contraseña en la configuración, el panel queda deshabilitado (503); si no coinciden las credenciales introducidas, responde 401. Los tokens de agentes/oportunidades no se reutilizan como credenciales administrativas.
 
 Usar HTTPS fuera de localhost. La autenticación Basic permanece en la sesión del navegador; no se implementa un sistema de cuentas o cierre de sesión. Una ventana privada facilita terminar la sesión cerrándola. El HTML del panel está en `app/templates`, fuera del directorio público estático.
 
@@ -121,7 +121,7 @@ Backend modificado: `app/main.py` registra el router, añade categoría a las co
 
 Frontend nuevo: `static/js/admin.js`, `static/css/admin.css`. Frontend modificado: `static/js/detalle.js` reconoce la categoría sin cambiar la secuencia de la galería. No se reemplazan las imágenes, el logo, los estilos ni los HTML públicos.
 
-También se añaden la migración, `tests/test_admin.py`, las dependencias Pillow/python-multipart y las variables de ejemplo.
+También se añaden la migración, `tests/test_admin.py`, las dependencias Pillow/python-multipart y la configuración del `.env` existente.
 
 ## Verificación
 
@@ -134,3 +134,6 @@ Pruebas con TestClient y dobles de DB/Storage: acceso y origen, propiedades opci
 Antes de la demostración, probar con la base y el bucket configurados: crear un inmueble, subir una imagen de cada categoría, cambiar portada, comprobar el catálogo con una oportunidad válida, editar sin perder fotos, eliminar una imagen y desactivar. Verificar que el bucket permita las URLs públicas y que el proxy admita solicitudes multipart de al menos 25 MB y el tiempo necesario de carga.
 
 No se ejecutaron pruebas visuales en navegador, ni escrituras sobre la base/Storage reales, ni despliegue remoto. Se mantiene el límite de alcance: preparación de la demo, sin CRM ni modificaciones de n8n.
+
+
+La configuración se lee del `.env` existente en la raíz del proyecto, independientemente del directorio desde el que se ejecute Uvicorn. No se requiere `.env.example`. Después de modificar `.env`, reiniciar el proceso; en Docker Compose recrear el contenedor con `docker compose up -d --force-recreate web` (si cambió el código, añadir `--build`).

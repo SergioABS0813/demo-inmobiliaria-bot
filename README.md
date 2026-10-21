@@ -2,7 +2,7 @@
 
 ## Panel interno de propiedades
 
-El CRUD está disponible en `/agente/propiedades`, protegido con HTTP Basic. Configurar `ADMIN_USERNAME` y `ADMIN_PASSWORD` (mínimo 16 caracteres) en el backend, aplicar manualmente `sql/03_admin_propiedades.sql` y verificar el bucket público existente `imagenes-inmobiliaria-demo`. Después instalar dependencias o reconstruir Docker.
+El CRUD está disponible en `/agente/propiedades`, protegido con HTTP Basic. Configurar `ADMIN_USERNAME` y `ADMIN_PASSWORD` en el backend, aplicar manualmente `sql/03_admin_propiedades.sql` y verificar el bucket público existente `imagenes-inmobiliaria-demo`. Después instalar dependencias o reconstruir Docker.
 
 Permite crear/editar/desactivar propiedades, subir fotos y planos, cambiar su orden y retirar imágenes con reintento de limpieza. No modifica n8n ni el modelo de oportunidades/visitas. Instrucciones, endpoints, archivos y límites: [CRUD_PROPIEDADES.md](documentacion/CRUD_PROPIEDADES.md).
 
@@ -36,7 +36,7 @@ La RPC de visita valida de nuevo bajo bloqueo, registra la visita, actualiza el 
 
 ## Configuración
 
-Crear `.env` a partir de `.env.example`, conservando la credencial de Supabase exclusivamente en el servidor:
+Usar exclusivamente el `.env` existente del proyecto, conservando la credencial de Supabase en el servidor:
 
 ```text
 SUPABASE_URL=...
@@ -92,3 +92,6 @@ La concurrencia y rollback reales requieren PostgreSQL de pruebas; el aspecto m�
 - [Swagger y CSP](API_DOCUMENTACION.md): carga de documentación sin relajar la CSP del catálogo.
 
 No se genera un workflow de n8n ni se añaden módulos de CRM, autenticación, edición de visitas o notificaciones nuevas.
+
+
+La configuración se lee del `.env` existente en la raíz del proyecto, independientemente del directorio desde el que se ejecute Uvicorn. No se requiere `.env.example`. Después de modificar `.env`, reiniciar el proceso; en Docker Compose recrear el contenedor con `docker compose up -d --force-recreate web` (si cambió el código, añadir `--build`).

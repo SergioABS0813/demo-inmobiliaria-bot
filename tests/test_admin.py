@@ -96,6 +96,10 @@ class AdminTests(unittest.TestCase):
         self.assertEqual(self.db.queries,[])
     def test_invalid_admin_password_rejected(self):
         self.assertEqual(self.client.get('/agente/propiedades',auth=('tester','incorrect')).status_code,401)
+    def test_configured_password_has_no_artificial_minimum(self):
+        with patch('app.admin_auth.get_settings',return_value=SimpleNamespace(admin_username='tester',admin_password=SecretStr('demo-test'))):
+            self.assertEqual(self.client.get('/agente/propiedades',auth=('tester','demo-test')).status_code,200)
+            self.assertEqual(self.client.get('/agente/propiedades',auth=('tester','wrong')).status_code,401)
     def test_unconfigured_panel_disabled(self):
         with patch('app.admin_auth.get_settings',return_value=SimpleNamespace(admin_username='tester',admin_password=None)):
             self.assertEqual(self.client.get('/agente/propiedades').status_code,503)
