@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Propiedades · Administración · Raíz Urbana</title>
+  <link rel="icon" href="/static/img/logotipo-inmobiliaria-sin-fondo.webp" type="image/webp">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/agente/propiedades">
+      <img class="admin-logo" src="/static/img/logotipo-inmobiliaria-sin-fondo.webp" alt="">
+      <span><strong>raíz urbana</strong><small>INMOBILIARIA</small></span>
+    </a>
+    <span class="pill">Administración de la demo</span>
+  </div>
+</header>
+<main class="container admin-main" id="main">
+  <div id="notice" class="notice" role="status" tabindex="-1" hidden></div>
+  <section id="list-view">
+    <div class="section-head page-title">
+      <div><span class="eyebrow">Tu catálogo, al día</span><h1>Propiedades</h1><p class="muted">Registra inmuebles, organiza sus fotografías y decide cuáles mostrar.</p></div>
+      <button class="btn teal" id="new-property" disabled>Nueva propiedad +</button>
+    </div>
+    <form class="card admin-filters" id="search-form">
+      <label class="label">Buscar por título<input id="search" name="q" type="search" maxlength="200" placeholder="Ej. Departamento en Miraflores"></label>
+      <label class="label">Distrito<select id="district-filter"><option value="">Todos los distritos</option></select></label>
+      <label class="label">Disponibilidad<select id="availability-filter"><option value="">Todas</option><option value="true">Disponible</option><option value="false">Desactivada</option></select></label>
+      <button class="btn" type="submit">Buscar</button>
+      <button class="btn secondary" type="button" id="clear-search">Limpiar</button>
+    </form>
+    <p class="muted admin-count" id="list-status" role="status">Cargando propiedades…</p>
+    <div class="card table-wrap" tabindex="0" aria-label="Tabla de propiedades, desplazable horizontalmente">
+      <table class="admin-table">
+        <thead><tr><th>ID</th><th>Propiedad</th><th>Distrito</th><th>Tipo</th><th>Operación</th><th>Precio</th><th>Agente</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody id="properties-body"><tr><td colspan="9">Cargando…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="admin-pagination"><button class="btn secondary" id="previous" disabled>← Anterior</button><span id="page-position"></span><button class="btn secondary" id="next" disabled>Siguiente →</button></div>
+    <aside class="notice cleanup-box" id="cleanup-box" hidden><div><strong>Hay archivos pendientes de limpieza.</strong><p>Se retiraron del catálogo, pero su eliminación de Storage necesita otro intento.</p></div><button class="btn secondary" id="retry-cleanup">Reintentar limpieza</button></aside>
+  </section>
+
+  <section id="editor-view" hidden>
+    <button class="btn text" id="back-list">← Volver al listado</button>
+    <div class="page-title"><span class="eyebrow">Gestión de inmuebles</span><h1 id="editor-title">Nueva propiedad</h1><p class="muted" id="editor-subtitle">Guarda la propiedad para añadir sus fotografías y planos.</p></div>
+    <form id="property-form">
+      <fieldset id="property-fields" disabled>
+        <section class="card admin-section">
+          <div class="admin-section-heading"><span>01</span><div><h2>Información general</h2><p>Presenta el inmueble con información clara y real.</p></div></div>
+          <div class="form-grid">
+            <label class="label">Título<input name="titulo" required maxlength="200" placeholder="Ej. Departamento luminoso en Miraflores"></label>
+            <label class="label">Descripción<textarea name="descripcion" rows="5" maxlength="15000" placeholder="Describe los ambientes y características registradas."></textarea></label>
+            <div class="form-row"><label class="label">Tipo de inmueble<select name="tipo_inmueble"><option value="">Sin especificar</option><option>Departamento</option><option>Casa</option><option>Terreno</option><option>Oficina</option><option>Local comercial</option></select></label><label class="label">Condición<input name="condicion" maxlength="100" placeholder="Ej. Estreno, usado, en proyecto"></label></div>
+            <label class="label">Proyecto (opcional)<input name="proyecto" maxlength="200"></label>
+          </div>
+        </section>
+        <section class="card admin-section">
+          <div class="admin-section-heading"><span>02</span><div><h2>Ubicación y características</h2><p>Los campos sin información pueden quedar vacíos.</p></div></div>
+          <div class="form-grid">
+            <div class="form-row"><label class="label">Distrito<select name="distrito_id"><option value="">Sin asignar</option></select></label><label class="label">Dirección<input name="direccion" maxlength="500"></label></div>
+            <div class="admin-features"><label class="label">Área total (m²)<input name="area_total" type="number" min="0.01" step="0.01" inputmode="decimal"></label><label class="label">Dormitorios<input name="cantidad_dormitorios" type="number" min="0" max="1000" step="1"></label><label class="label">Baños<input name="cantidad_banos" type="number" min="0" max="1000" step="1"></label><label class="label">Cocheras<input name="cocheras" type="number" min="0" max="1000" step="1"></label></div>
+          </div>
+        </section>
+        <section class="card admin-section">
+          <div class="admin-section-heading"><span>03</span><div><h2>Precio y operación</h2><p>Define la moneda y el agente responsable.</p></div></div>
+          <div class="form-grid">
+            <div class="admin-features"><label class="label">Operación<select name="tipo_operacion"><option value="">Sin especificar</option><option>Venta</option><option>Alquiler</option></select></label><label class="label">Moneda<select name="moneda"><option value="">Sin especificar</option><option value="PEN">Soles · PEN</option><option value="USD">Dólares · USD</option></select></label><label class="label">Precio<input name="precio" type="number" min="0" step="0.01" inputmode="decimal"></label><label class="label">Agente<select name="agente_id"><option value="">Sin asignar</option></select></label></div>
+          </div>
+        </section>
+        <section class="card admin-section">
+          <div class="admin-section-heading"><span>04</span><div><h2>Disponibilidad</h2><p>Desactivar retira el inmueble del catálogo y conserva su historial.</p></div></div>
+          <label class="check availability-check"><input type="checkbox" name="disponible" role="switch"><span><strong>Mostrar esta propiedad en el catálogo</strong><br>Si está desactivada, no admite nuevas solicitudes desde la web.</span></label>
+        </section>
+        <div class="save-actions"><small class="muted">Guardar datos no reemplaza las imágenes existentes.</small><button class="btn teal" type="submit" id="save-property">Guardar propiedad</button></div>
+      </fieldset>
+    </form>
+
+    <section class="card admin-section" id="media-section">
+      <div class="admin-section-heading"><span>05</span><div><h2>Fotografías y planos</h2><p id="media-help">Primero guarda la propiedad. Las carpetas se crean automáticamente al subir archivos.</p></div></div>
+      <form id="upload-form"><fieldset id="media-fields" disabled>
+        <div class="upload-controls"><label class="label">Categoría<select id="image-category"><option value="vista_1">Áreas sociales · vista_1</option><option value="vista_2">Áreas privadas · vista_2</option><option value="plano">Planos · plano</option></select></label><label class="label">Seleccionar imágenes<input id="image-files" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><button class="btn" type="submit" id="upload-images">Subir imágenes</button></div>
+        <p class="privacy">JPEG, PNG o WebP estático. Máximo 8 MB y 24 megapíxeles por imagen; hasta 6 archivos y 24 MB por subida.</p>
+        <div class="image-previews" id="upload-previews" aria-label="Vista previa de archivos seleccionados"></div>
+      </fieldset></form>
+      <div class="section-head"><p id="images-status" class="muted" role="status">Aún no hay imágenes.</p><button class="btn secondary" id="save-order" disabled>Guardar orden</button></div>
+      <div class="admin-images" id="images-list"></div>
+    </section>
+  </section>
+</main>
+<footer class="footer"><div class="container"><span>Raíz Urbana Inmobiliaria · Herramienta interna para preparar la demo</span><span>Lima, Perú</span></div></footer>
+<noscript><p class="error">Activa JavaScript para administrar las propiedades.</p></noscript>
+<script type="module" src="/static/js/admin.js"></script>
+</body>
+</html>

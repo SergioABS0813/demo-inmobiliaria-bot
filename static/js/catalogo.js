@@ -5,6 +5,20 @@ const grid=document.getElementById('results'), form=document.getElementById('fil
 const more=document.getElementById('more'), status=document.getElementById('result-status');
 let controller, revision=0, offset=0, query=new URLSearchParams(), loaded=0;
 function option(select,value,label){select.append(el('option',{value},label));}
+function populate(select,items){
+  while(select.options.length>1)select.remove(1);
+  for(const [value,label] of items)option(select,value,label);
+}
+function populateOperations(values=[]){
+  const normalized=value=>String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+  const buying=new Set(['venta','compra','comprar']);
+  const renting=new Set(['alquiler','alquilar']);
+  const sale=values.find(value=>buying.has(normalized(value)))||'venta';
+  const rent=values.find(value=>renting.has(normalized(value)))||'alquiler';
+  populate(form.elements.tipo_operacion,[[sale,'Comprar'],[rent,'Alquilar'],
+    ...values.filter(value=>!buying.has(normalized(value))&&!renting.has(normalized(value))).map(value=>[value,value])]);
+}
+populateOperations();
 async function init(){
   try {
     const [context,options]=await Promise.all([api('/lead/contexto'),api('/propiedades/filtros')]);
@@ -12,10 +26,10 @@ async function init(){
       grid.before(el('p',{id:'existing-visit',class:'notice'},'Ya tienes una visita solicitada para esta oportunidad. ',el('a',{href:`${base}/confirmacion/${context.visita_id}`,class:'btn text'},'Consultar mi solicitud ↗')));
     }
     if(context.nombre) document.getElementById('welcome').textContent=`Un nuevo comienzo, ${context.nombre.split(' ')[0]}`;
-    for (const [field,list] of [['tipo_operacion',options.operaciones],['tipo_inmueble',options.tipos],['moneda',options.monedas]]) {
-      for(const value of list) option(form.elements[field],value,value);
-    }
-    for(const d of options.distritos) option(form.elements.distrito_id,d.id,d.nombre);
+    populateOperations(options.operaciones);
+    populate(form.elements.tipo_inmueble,(options.tipos||[]).map(value=>[value,value]));
+    populate(form.elements.moneda,(options.monedas||[]).map(value=>[value,value]));
+    populate(form.elements.distrito_id,(options.distritos||[]).map(d=>[d.id,d.nombre]));
     document.getElementById('filter-fieldset').disabled=false;
     await load();
   }catch(error){finish(grid);fail(grid,error,init);}

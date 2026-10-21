@@ -33,25 +33,26 @@ async function load(){
 }
 function buildGallery(p){
   const list=images(p);if(!list.length)list.push({url:null});let index=0;
+  const imageName=i=>list[i].categoria==='plano'?'Plano de distribución':list[i].categoria==='vista_1'?'Áreas sociales':list[i].categoria==='vista_2'?'Áreas privadas':`Fotografía ${i+1}`;
   const stage=el('div',{class:'gallery-stage','aria-label':'Galería de la propiedad'});
-  const current=photo(list[0].url,`${p.titulo}, fotografía 1`,{lazy:false});current.className='gallery-main';
-  const count=el('span',{class:'gallery-count',role:'status'},`1 / ${list.length}`);
+  const current=photo(list[0].url,`${p.titulo}, ${imageName(0)}`,{lazy:false});current.className='gallery-main';
+  const count=el('span',{class:'gallery-count',role:'status'},`${list[0].categoria==='plano'?'Plano · ':''}1 / ${list.length}`);
   const thumbs=el('div',{class:'thumbnails','aria-label':'Seleccionar fotografía'});
   const dialog=document.getElementById('photo-dialog'),full=document.getElementById('full-photo');
   let lastFocus;
   function update(next){
     index=(next+list.length)%list.length;
-    const replacement=photo(list[index].url,`${p.titulo}, fotografía ${index+1}`,{lazy:false});replacement.className='gallery-main';
+    const replacement=photo(list[index].url,`${p.titulo}, ${imageName(index)}`,{lazy:false});replacement.className='gallery-main';
     stage.querySelector('.gallery-main').replaceWith(replacement);
-    count.textContent=`${index+1} / ${list.length}`;
+    count.textContent=`${list[index].categoria==='plano'?'Plano · ':''}${index+1} / ${list.length}`;
     thumbs.querySelectorAll('button').forEach((button,i)=>button.setAttribute('aria-pressed',String(i===index)));
     if(dialog.open)updateFull();
   }
-  function updateFull(){full.replaceChildren(photo(list[index].url,`${p.titulo}, fotografía ${index+1} ampliada`,{lazy:false}));full.firstChild.className='dialog-photo';document.getElementById('photo-position').textContent=`${index+1} de ${list.length}`;}
+  function updateFull(){full.replaceChildren(photo(list[index].url,`${p.titulo}, ${imageName(index)} ampliada`,{lazy:false}));full.firstChild.className='dialog-photo';document.getElementById('photo-position').textContent=`${index+1} de ${list.length}`;}
   const prev=()=>update(index-1),next=()=>update(index+1);
   stage.append(current,el('div',{class:'gallery-nav'},el('button',{class:'icon-btn',type:'button','aria-label':'Fotografía anterior',onclick:prev},'‹'),count,el('button',{class:'icon-btn',type:'button','aria-label':'Fotografía siguiente',onclick:next},'›')),
     el('button',{class:'btn gallery-open',type:'button',onclick:event=>{lastFocus=event.currentTarget;dialog.showModal();updateFull();}},'⤢ Ampliar'));
-  list.forEach((image,i)=>thumbs.append(el('button',{class:'thumb',type:'button','aria-label':`Ver fotografía ${i+1}`,'aria-pressed':String(i===0),onclick:()=>update(i)},photo(image.url,`${p.titulo}, miniatura ${i+1}`,{thumb:true}))));
+  list.forEach((image,i)=>thumbs.append(el('button',{class:'thumb',type:'button','aria-label':`Ver ${imageName(i)}, ${i+1}`,'aria-pressed':String(i===0),onclick:()=>update(i)},photo(image.url,`${p.titulo}, ${imageName(i)}`,{thumb:true}))));
   document.getElementById('photo-prev').onclick=prev;document.getElementById('photo-next').onclick=next;
   document.getElementById('photo-close').onclick=()=>dialog.close();
   dialog.addEventListener('close',()=>{full.replaceChildren();lastFocus?.focus();});

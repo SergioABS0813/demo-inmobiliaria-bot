@@ -11,11 +11,13 @@ from .config import get_settings
 from .schemas import VisitIn, PropertyOut, OpportunityContextOut, VisitCreatedOut, VisitOut
 from .services import require_opportunity, current_visit, create_visit, normalize_property
 from .docs import install_documentation
+from .admin import router as admin_router
 
 ROOT = Path(__file__).resolve().parent.parent
 # Custom documentation routes allow their CDN assets without relaxing the site CSP.
 app = FastAPI(title="Raíz Urbana", docs_url=None, redoc_url=None, openapi_url="/openapi.json")
 install_documentation(app)
+app.include_router(admin_router)
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 def read_token(
     value: Annotated[str | None, Header(alias="X-Opportunity-Token", description="Token UUID de la oportunidad abierta")] = None,
@@ -33,7 +35,7 @@ def read_token(
 
 
 Token = Annotated[UUID, Depends(read_token)]
-PROPERTY_FIELDS = "id,titulo,descripcion,tipo_operacion,tipo_inmueble,condicion,proyecto,distrito_id,moneda,precio,cantidad_dormitorios,cantidad_banos,cocheras,area_total,direccion,disponible,distritos(nombre),propiedad_imagenes(id,url,orden)"
+PROPERTY_FIELDS = "id,titulo,descripcion,tipo_operacion,tipo_inmueble,condicion,proyecto,distrito_id,moneda,precio,cantidad_dormitorios,cantidad_banos,cocheras,area_total,direccion,disponible,distritos(nombre),propiedad_imagenes(id,url,orden,categoria)"
 
 
 @app.middleware("http")
@@ -45,6 +47,8 @@ async def security_headers(request: Request, call_next):
         "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
     })
     response.headers.setdefault("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'")
+    if request.url.path == '/agente/propiedades':
+        response.headers['Content-Security-Policy'] = response.headers['Content-Security-Policy'].replace("img-src 'self' https:","img-src 'self' https: blob:")
     return response
 
 
@@ -53,6 +57,9 @@ async def database_error(request, error):
     # Never return raw PostgREST errors: they may include SQL or token values.
     message = error.message or ""
     rules = {
+        "RU_ADMIN_PROPERTY": (404, "La propiedad no existe."),
+        "RU_ADMIN_IMAGE": (404, "La imagen ya no existe."),
+        "RU_ADMIN_ORDER": (409, "Las imágenes cambiaron. Recarga la lista antes de ordenarlas."),
         "RU_TOKEN": (404, "El enlace no es válido."),
         "RU_CLOSED": (403, "Esta oportunidad ya está cerrada. Solicita un nuevo enlace por WhatsApp."),
         "RU_UNAVAILABLE": (409, "La propiedad ya no está disponible."),
@@ -60,6 +67,8 @@ async def database_error(request, error):
         "RU_CONSENT": (422, "Autoriza el tratamiento de datos para solicitar la visita."),
         "RU_REPLAY": (409, "Esta clave de solicitud ya se utilizó con otros datos."),
     }
+    if request.url.path.startswith('/api/agente/') and error.code in ('23503','23514','23505'):
+        return JSONResponse({'detail':'No se pudo guardar: revisa las referencias y los valores; otro agente pudo modificarlos.'},status_code=409)
     if "RU_VISIT_EXISTS" in message:
         raw_id = str(error.details or "")
         visit_id = int(raw_id) if raw_id.isdigit() else None
@@ -100,7 +109,7 @@ def properties(token: Token, tipo_operacion: str | None = None, tipo_inmueble: s
     query = db.table("propiedades").select(PROPERTY_FIELDS).eq("disponible", True)
     for field, value in (("tipo_operacion", tipo_operacion), ("tipo_inmueble", tipo_inmueble), ("distrito_id", distrito_id), ("moneda", moneda)):
         if value is not None:
-            query = query.eq(field, value)
+            query = query.ilike(field, value) if field == "tipo_operacion" else query.eq(field, value)
     for field, method, value in (("precio", "gte", precio_min), ("precio", "lte", precio_max), ("cantidad_dormitorios", "gte", dormitorios_min)):
         if value is not None:
             query = getattr(query, method)(field, str(value))
@@ -111,8 +120,24 @@ def properties(token: Token, tipo_operacion: str | None = None, tipo_inmueble: s
 @app.get("/api/propiedades/filtros")
 def filter_options(token: Token, db=Depends(get_db)):
     require_opportunity(db, token)
-    # RPC uses DISTINCT server-side, avoiding the default Supabase 1000-row cap.
-    return db.rpc("ru_filtros_propiedades", {}).execute().data
+    # Metadata is not restricted to currently available properties. Districts
+    # come from their own registry, not from the current search results.
+    def read_all(table, fields):
+        rows = []
+        offset = 0
+        while True:
+            batch = db.table(table).select(fields).order("id").range(offset, offset + 499).execute().data
+            rows.extend(batch)
+            if len(batch) < 500:
+                return rows
+            offset += len(batch)
+
+    registered = read_all("propiedades", "id,tipo_operacion,tipo_inmueble,moneda")
+    districts = read_all("distritos", "id,nombre")
+    def values(field):
+        return sorted({r[field] for r in registered if isinstance(r.get(field), str) and r[field].strip()}, key=str.casefold)
+    return {"operaciones": values("tipo_operacion"), "tipos": values("tipo_inmueble"),
+            "monedas": values("moneda"), "distritos": sorted(districts, key=lambda d: d["nombre"].casefold())}
 
 
 @app.get("/api/propiedades/{property_id}", response_model=PropertyOut)

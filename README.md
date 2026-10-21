@@ -1,5 +1,11 @@
 # Raíz Urbana Inmobiliaria
 
+## Panel interno de propiedades
+
+El CRUD está disponible en `/agente/propiedades`, protegido con HTTP Basic. Configurar `ADMIN_USERNAME` y `ADMIN_PASSWORD` (mínimo 16 caracteres) en el backend, aplicar manualmente `sql/03_admin_propiedades.sql` y verificar el bucket público existente `imagenes-inmobiliaria-demo`. Después instalar dependencias o reconstruir Docker.
+
+Permite crear/editar/desactivar propiedades, subir fotos y planos, cambiar su orden y retirar imágenes con reintento de limpieza. No modifica n8n ni el modelo de oportunidades/visitas. Instrucciones, endpoints, archivos y límites: [CRUD_PROPIEDADES.md](documentacion/CRUD_PROPIEDADES.md).
+
 Catálogo inmobiliario y solicitudes de visita desde enlaces personalizados de WhatsApp. FastAPI, Pydantic v2, Supabase PostgreSQL, HTML/CSS/JavaScript vanilla, Uvicorn y Docker. No requiere compilación de frontend.
 
 ## Modelo actual
