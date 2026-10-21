@@ -5,3 +5,5 @@
 /* Discreet focus inside the control, without the outer turquoise outline. */
 .filters select:focus-visible{outline:none;border-color:var(--blue);box-shadow:inset 0 0 0 1px var(--blue);}
 
+
+.hero-art{min-width:0;margin-right:min(-24px,calc((1180px - 100vw)/2))}.hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
