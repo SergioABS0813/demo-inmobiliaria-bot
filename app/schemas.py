@@ -34,7 +34,19 @@ class VisitIn(BaseModel):
         return value
 
 
+class PropertyOpportunityIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    propiedad_id: int = Field(gt=0)
+
+
+class PropertyOpportunityOut(BaseModel):
+    token_uuid: UUID
+    propiedad_id: int | None
+    visita_id: int | None
+
+
 class OpportunityContextOut(BaseModel):
+    propiedad_id: int | None = None
     nombre: str | None
     telefono: str | None = None
     estado_oportunidad: str

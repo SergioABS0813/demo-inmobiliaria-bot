@@ -5,8 +5,9 @@ const main=document.getElementById('detail');
 async function load(){
   try{
     const [p,context]=await Promise.all([api(`/propiedades/${propertyId}`),api('/lead/contexto')]);document.title=`${p.titulo} · Raíz Urbana`;
-    const href=context.visita_id?`${base}/confirmacion/${context.visita_id}`:`${base}/propiedad/${p.id}/solicitar`;
-    const actionLabel=context.visita_id?'Consultar mi solicitud':'Solicitar una visita ↗';
+    const samePropertyVisit=context.propiedad_id===p.id?context.visita_id:null;
+    const href=samePropertyVisit?`${base}/confirmacion/${context.visita_id}`:`${base}/propiedad/${p.id}/solicitar`;
+    const actionLabel=samePropertyVisit?'Consultar mi solicitud':'Solicitar una visita ↗';
     const price=money(p.precio,p.moneda);
     const heading=el('div',{class:'detail-heading'},el('div',{},el('span',{class:'pill'},p.tipo_operacion),
       el('h1',{},p.titulo),el('p',{},[p.direccion,p.distrito].filter(Boolean).join(' · '))),el('div',{class:'detail-price'},price));
@@ -22,13 +23,13 @@ async function load(){
       if(value)definitions.append(el('div',{},el('dt',{},label),el('dd',{},value)));
     }
     description.append(definitions);
-    const action=p.disponible||context.visita_id?el('a',{class:'btn teal',href},actionLabel):el('p',{class:'error'},'Esta propiedad ya no está disponible para nuevas visitas.');
+    const action=p.disponible||samePropertyVisit?el('a',{class:'btn teal',href},actionLabel):el('p',{class:'error'},'Esta propiedad ya no está disponible para nuevas visitas.');
     const aside=el('aside',{class:'card visit-cta'},el('span',{class:'eyebrow'},'Da el siguiente paso'),el('h2',{},'Conoce tu próximo hogar'),
       el('p',{},'Recorre el espacio, resuelve tus dudas y descubre si es el lugar para ti.'),action,
-      el('small',{},context.visita_id?'Esta oportunidad ya tiene una visita solicitada. Coordina visitas adicionales con tu asesor.':'La fecha que elijas es una preferencia. Nuestro asesor coordinará la visita contigo.'),
+      el('small',{},samePropertyVisit?'Esta oportunidad ya tiene una visita solicitada. Coordina visitas adicionales con tu asesor.':'La fecha que elijas es una preferencia. Nuestro asesor coordinará la visita contigo.'),
       el('div',{class:'trust-line'},'Atención cercana, de principio a fin.'));
     main.replaceChildren(heading,gallery,el('div',{class:'detail-layout'},description,aside));
-    if(p.disponible||context.visita_id)main.append(el('div',{class:'mobile-cta'},el('div',{},el('small',{},p.tipo_operacion),el('strong',{},price)),el('a',{class:'btn teal',href},actionLabel)));
+    if(p.disponible||samePropertyVisit)main.append(el('div',{class:'mobile-cta'},el('div',{},el('small',{},p.tipo_operacion),el('strong',{},price)),el('a',{class:'btn teal',href},actionLabel)));
   }catch(error){fail(main,error,load);}finally{finish(main);}
 }
 function buildGallery(p){

@@ -48,7 +48,7 @@ export function state(container, title, text, retry) {
 }
 export function fail(container,error,retry) {const invalid=[401,403,404].includes(error.status);state(container,invalid?'Acceso no disponible':'No pudimos cargar la información',error.message,invalid?null:retry);}
 export function existingVisit(container,id) {
-  container.replaceChildren(el('h2',{},'Ya recibimos tu solicitud'),el('p',{class:'notice'},'Esta oportunidad ya tiene una visita solicitada. Puedes seguir explorando propiedades; las visitas adicionales se coordinan directamente con tu asesor.'),el('a',{class:'btn teal',href:id?`${base}/confirmacion/${id}`:`${base}/mis-visitas`},'Consultar mi solicitud'));
+  container.replaceChildren(el('h2',{},'Ya recibimos tu solicitud'),el('p',{class:'notice'},'Ya hay una solicitud para este inmueble. Puedes seguir explorando el catálogo y solicitar una visita a otro inmueble.'),el('a',{class:'btn teal',href:id?`${base}/confirmacion/${id}`:`${base}/mis-visitas`},'Consultar mi solicitud'));
 }
 export function shell(active='catalogo') {
   const header=document.getElementById('header');

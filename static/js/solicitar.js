@@ -1,4 +1,4 @@
-import {api,base,propertyId} from './api.js';
+import {api,base,propertyId,setOpportunityToken} from './api.js';
 import {el,shell,photo,images,money,fail,finish,existingVisit} from './utils.js';
 shell();
 const form=document.getElementById('request-form'),panel=document.getElementById('property-summary');
@@ -9,10 +9,18 @@ function editRequest(){review.hidden=true;fields.hidden=false;reviewedPayload=nu
 edit.addEventListener('click',()=>{if(sending)return;editRequest();form.elements.nombre.focus();});
 const storageKey=`ru-request:${propertyId}`;
 function todayLima(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Lima',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
+async function resolveOpportunity(){
+  const resolved=await api('/oportunidades/resolver',{method:'POST',body:{propiedad_id:propertyId}});
+  setOpportunityToken(resolved.token_uuid);
+  history.replaceState(null,'',`${base}/propiedad/${propertyId}/solicitar`);shell();
+  return resolved;
+}
 async function load(){
   try{
+    const resolved=await resolveOpportunity();
+    if(resolved.visita_id){existingVisit(form,resolved.visita_id);panel.hidden=true;return;}
     const [p,context]=await Promise.all([api(`/propiedades/${propertyId}`),api('/lead/contexto')]);
-    if(context.visita_id){existingVisit(form,context.visita_id);panel.hidden=true;return;}
+    if(context.visita_id&&context.propiedad_id===propertyId){existingVisit(form,context.visita_id);panel.hidden=true;return;}
     if(!p.disponible){form.hidden=true;panel.replaceChildren(el('p',{class:'error'},'Esta propiedad ya no está disponible para nuevas visitas.'));return;}
     selectedProperty=p;
     panel.replaceChildren(photo(images(p)[0]?.url,p.titulo,{lazy:false}),el('div',{},el('span',{class:'pill'},p.tipo_operacion),el('h2',{},p.titulo),el('p',{class:'muted'},p.distrito),el('strong',{class:'detail-price'},money(p.precio,p.moneda))));
@@ -64,7 +72,14 @@ form.addEventListener('submit',async event=>{
       try{sessionStorage.removeItem(storageKey);}catch{}
       existingVisit(form,err.detail.visita_id);return;
     }
-    showError(err.message);sending=false;fields.disabled=false;submit.textContent='Revisar solicitud';confirm.disabled=false;edit.disabled=false;confirm.textContent='Confirmar y enviar solicitud';
+    if(['RU_PROPERTY_MISMATCH','RU_PROPERTY_ALREADY_OPEN'].includes(err.detail?.code)){
+      try{
+        const resolved=await resolveOpportunity();
+        if(resolved.visita_id){existingVisit(form,resolved.visita_id);return;}
+        showError('Actualizamos el enlace para este inmueble. Revisa tus datos y confirma nuevamente.');
+      }catch(resolveError){showError(resolveError.message);}
+    }else showError(err.message);
+    sending=false;fields.disabled=false;submit.textContent='Revisar solicitud';confirm.disabled=false;edit.disabled=false;confirm.textContent='Confirmar y enviar solicitud';
   }
 });
 load();

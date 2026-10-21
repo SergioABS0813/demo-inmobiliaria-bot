@@ -23,7 +23,7 @@ async function init(){
   try {
     const [context,options]=await Promise.all([api('/lead/contexto'),api('/propiedades/filtros')]);
     if(context.visita_id&&!document.getElementById('existing-visit')){
-      grid.before(el('p',{id:'existing-visit',class:'notice'},'Ya tienes una visita solicitada para esta oportunidad. ',el('a',{href:`${base}/confirmacion/${context.visita_id}`,class:'btn text'},'Consultar mi solicitud ↗')));
+      grid.before(el('p',{id:'existing-visit',class:'notice'},'Ya tienes una visita solicitada. Puedes seguir explorando y solicitar otra para un inmueble diferente. ',el('a',{href:`${base}/confirmacion/${context.visita_id}`,class:'btn text'},'Consultar mi solicitud ↗')));
     }
     if(context.nombre) document.getElementById('welcome').textContent=`Un nuevo comienzo, ${context.nombre.split(' ')[0]}`;
     populateOperations(options.operaciones);

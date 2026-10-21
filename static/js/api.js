@@ -1,6 +1,6 @@
 const segments = location.pathname.split('/').filter(Boolean);
-export const token = segments[0] === 'inmuebles' ? segments[1] : null;
-export const base = token ? `/inmuebles/${encodeURIComponent(token)}` : '/';
+export let token = segments[0] === 'inmuebles' ? segments[1] : null;
+export let base = token ? `/inmuebles/${encodeURIComponent(token)}` : '/';
 export const propertyId = segments[2] === 'propiedad' ? Number(segments[3]) : null;
 
 export class ApiError extends Error {
@@ -30,4 +30,9 @@ export async function api(path, {signal, body, method = 'GET'} = {}) {
   } finally {
     clearTimeout(timer); signal?.removeEventListener('abort', abort);
   }
+}
+
+export function setOpportunityToken(value){
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value))throw new ApiError('El servidor devolvio un enlace no valido.',503);
+  token=value;base=`/inmuebles/${encodeURIComponent(token)}`;
 }

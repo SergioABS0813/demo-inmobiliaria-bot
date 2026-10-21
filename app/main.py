@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from postgrest.exceptions import APIError
 from .db import get_db
 from .config import get_settings
-from .schemas import VisitIn, PropertyOut, OpportunityContextOut, VisitCreatedOut, VisitOut
+from .schemas import PropertyOpportunityIn, PropertyOpportunityOut, VisitIn, PropertyOut, OpportunityContextOut, VisitCreatedOut, VisitOut
 from .services import require_opportunity, current_visit, create_visit, normalize_property
 from .docs import install_documentation
 from .admin import router as admin_router
@@ -58,6 +58,8 @@ async def security_headers(request: Request, call_next):
 async def database_error(request, error):
     # Never return raw PostgREST errors: they may include SQL or token values.
     message = error.message or ""
+    if request.url.path == "/api/oportunidades/resolver" and error.code == "PGRST202":
+        return JSONResponse({"detail": "Falta configurar las oportunidades por inmueble. Aplica la migracion 06 en Supabase."}, status_code=503)
     rules = {
         "RU_ADMIN_PROPERTY": (404, "La propiedad no existe."),
         "RU_ADMIN_IMAGE": (404, "La imagen ya no existe."),
@@ -71,6 +73,10 @@ async def database_error(request, error):
     }
     if request.url.path.startswith('/api/agente/') and error.code in ('23503','23514','23505'):
         return JSONResponse({'detail':'No se pudo guardar: revisa las referencias y los valores; otro agente pudo modificarlos.'},status_code=409)
+    for tag, text in (("RU_PROPERTY_MISMATCH", "La oportunidad ya esta asociada a otro inmueble."),
+                      ("RU_PROPERTY_ALREADY_OPEN", "Ya existe una oportunidad abierta para este inmueble. Consulta su solicitud.")):
+        if tag in message:
+            return JSONResponse({"detail": {"code": tag, "mensaje": text}}, status_code=409)
     if "RU_VISIT_EXISTS" in message:
         raw_id = str(error.details or "")
         visit_id = int(raw_id) if raw_id.isdigit() else None
@@ -94,8 +100,14 @@ def context(token: Token, db=Depends(get_db)):
     opportunity = require_opportunity(db, token)
     visit = current_visit(db, opportunity["id"])
     return {"nombre": opportunity["leads"]["nombre"], "telefono": opportunity["leads"].get("telefono"), "estado_oportunidad": opportunity["estado_oportunidad"]["nombre"],
-            "visita_id": visit["id"] if visit else None, "puede_solicitar": visit is None,
+            "propiedad_id": opportunity.get("propiedad_id"), "visita_id": visit["id"] if visit else None, "puede_solicitar": visit is None,
             "privacy_contact": get_settings().privacy_contact}
+
+
+@app.post("/api/oportunidades/resolver", response_model=PropertyOpportunityOut, tags=["Oportunidades"], summary="Resolver una oportunidad del mismo lead para otro inmueble")
+def resolve_property_opportunity(body: PropertyOpportunityIn, token: Token, db=Depends(get_db)):
+    require_opportunity(db, token)
+    return db.rpc("ru_resolver_oportunidad_propiedad", {"p_token": str(token), "p_propiedad_id": body.propiedad_id}).execute().data
 
 
 @app.get("/api/propiedades", response_model=list[PropertyOut])

@@ -10,7 +10,7 @@ LIMA = timezone(timedelta(hours=-5), "America/Lima")
 def require_opportunity(db, token):
     """The capability belongs to an OPEN opportunity, never to leads."""
     rows = (db.table("oportunidades")
-            .select("id,lead_id,estado_id,resultado,fecha_cierre,leads(id,nombre,telefono),estado_oportunidad(nombre)")
+            .select("id,lead_id,propiedad_id,estado_id,resultado,fecha_cierre,leads(id,nombre,telefono),estado_oportunidad(nombre)")
             .eq("token_uuid", str(token)).limit(2).execute().data)
     if not rows:
         raise HTTPException(404, "El enlace no es válido. Solicita uno nuevo por WhatsApp.")
@@ -51,6 +51,8 @@ def create_visit(db, token, body):
     if not body.consentimiento:
         raise HTTPException(422, "Autoriza el uso de tus datos para gestionar esta solicitud.")
     validate_timezone(body.fecha_cliente)
+    if opportunity.get("propiedad_id") is not None and opportunity["propiedad_id"] != body.propiedad_id:
+        raise HTTPException(409, {"code": "RU_PROPERTY_MISMATCH", "mensaje": "Este enlace ya esta asociado a otro inmueble. Resuelve una oportunidad para la propiedad seleccionada."})
     fingerprint = request_fingerprint(body)
     existing = current_visit(db, opportunity["id"])
     if existing:
