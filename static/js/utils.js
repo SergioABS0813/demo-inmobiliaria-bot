@@ -55,7 +55,7 @@ export function shell(active='catalogo') {
   const back=document.getElementById('back');if(back)back.href=base;
   header.replaceChildren(el('div',{class:'container header-inner'},
     el('a',{class:'brand',href:base,'aria-label':'Raíz Urbana, catálogo'},
-      el('span',{class:'brand-mark','aria-hidden':'true'},'⌂'),
+      el('img',{class:'brand-logo',src:'/static/img/logotipo-inmobiliaria-sin-fondo.webp',alt:'',width:'60',height:'48'}),
       el('span',{},el('strong',{},'raíz urbana'),el('small',{},'INMOBILIARIA'))),
     el('nav',{class:'nav','aria-label':'Navegación principal'},
       el('a',{href:base,'aria-current':active==='catalogo'?'page':null},'Propiedades'),
